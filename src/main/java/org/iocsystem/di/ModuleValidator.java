@@ -1,8 +1,9 @@
 package org.iocsystem.di;
 
+import org.iocsystem.utils.ReflectUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
 
 public class ModuleValidator {
@@ -17,13 +18,13 @@ public class ModuleValidator {
             throw new ValidationException("Class: " + clazz + " cannot be abstract");
         }
 
-        List<Constructor> constructors = Arrays.asList(clazz.getDeclaredConstructors());
-        boolean validConstructorFound = false;
+        Constructor[] constructors = clazz.getDeclaredConstructors();
 
-        if (isOnlyDefaultConstructorPresent(constructors)) {
+        if (ReflectUtils.isOnlyDefaultConstructorPresent(constructors)) {
             return;
         }
 
+        boolean validConstructorFound = false;
         for (Constructor constructor : constructors) {
             boolean isResolvePresent = (constructor.getAnnotation(Resolve.class) != null);
             if (!validConstructorFound && isResolvePresent) {
@@ -36,9 +37,5 @@ public class ModuleValidator {
         if (!validConstructorFound) {
             throw new ValidationException("None single @Resolve annotated constructor found");
         }
-    }
-
-    private static boolean isOnlyDefaultConstructorPresent(List<Constructor> constructors) {
-        return constructors.size() == 1 && constructors.get(0).getParameterCount() == 0;
     }
 }
