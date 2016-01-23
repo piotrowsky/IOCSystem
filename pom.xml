@@ -36,8 +36,9 @@
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <violationSeverity>warning</violationSeverity>
-                            <linkXRef>false</linkXRef>
+                            <linkXRef>true</linkXRef>
                             <configLocation>google_checkstyle.xml</configLocation>
+                            <includeTestSourceDirectory>false</includeTestSourceDirectory>
                         </configuration>
                         <goals>
                             <goal>check</goal>
@@ -52,7 +53,7 @@
                 <version>3.6</version>
                 <configuration>
                     <skip>${code.checks.disabled}</skip>
-                    <includeTests>true</includeTests>
+                    <includeTests>false</includeTests>
                     <minimumTokens>100</minimumTokens>
                     <printFailingErrors>true</printFailingErrors>
                     <linkXref>true</linkXref>

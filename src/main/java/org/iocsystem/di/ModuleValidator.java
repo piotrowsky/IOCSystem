@@ -4,7 +4,6 @@ import org.iocsystem.utils.ReflectUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.List;
 
 public class ModuleValidator {
 
@@ -26,7 +25,7 @@ public class ModuleValidator {
 
         boolean validConstructorFound = false;
         for (Constructor constructor : constructors) {
-            boolean isResolvePresent = (constructor.getAnnotation(Resolve.class) != null);
+            boolean isResolvePresent = constructor.getAnnotation(Resolve.class) != null;
             if (!validConstructorFound && isResolvePresent) {
                 validConstructorFound = true;
             } else if (validConstructorFound && isResolvePresent) {
