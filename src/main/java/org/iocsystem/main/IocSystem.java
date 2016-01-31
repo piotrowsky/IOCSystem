@@ -1,6 +1,7 @@
 package org.iocsystem.main;
 
 import org.iocsystem.di.AnnotationTypeFilter;
+import org.iocsystem.di.Configuration;
 import org.iocsystem.di.CycleFinder;
 import org.iocsystem.di.CycleFinderException;
 import org.iocsystem.di.DependencyMapBuilder;
@@ -20,9 +21,9 @@ public class IocSystem {
     private IocSystem() {
     }
 
-    public static void run(final String prefix) throws IocSystemException {
+    public static void run() throws IocSystemException {
         try {
-            Set<Class<?>> modules = new AnnotationTypeFilter().filter(Module.class, prefix);
+            Set<Class<?>> modules = new AnnotationTypeFilter().filter(Module.class, Configuration.getScanPrefix());
             validateAnnotations(modules);
             Map<Class, ModuleMetadata> dependencyMap = new DependencyMapBuilder(modules).build();
             validateDepencyTree(dependencyMap);
@@ -43,13 +44,13 @@ public class IocSystem {
 
     private static void validateAnnotations(Iterable<Class<?>> modules) throws ValidationException {
         ModuleValidator validator = new ModuleValidator();
-        // TODO check resolvability
         for (Class<?> module : modules) {
             validator.validate(module);
         }
     }
 
     private static void validateDepencyTree(Map<Class, ModuleMetadata> dependencyMap) throws CycleFinderException {
+        // TODO check resolvability
         new CycleFinder(dependencyMap).find();
     }
 }

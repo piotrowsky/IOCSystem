@@ -12,8 +12,6 @@ public class ModuleValidatorUnitTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-
-
     @Test
     public void case1() throws ValidationException {
         new ModuleValidator().validate(TestClasses.Case1.class);

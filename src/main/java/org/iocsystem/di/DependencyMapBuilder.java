@@ -18,7 +18,7 @@ public class DependencyMapBuilder {
     public Map<Class, ModuleMetadata> build() throws DependencyMapBuilderException {
         ConstructorFinder finder = new ConstructorFinder();
         Map<Class, ModuleMetadata> map = new HashMap<>();
-        for (Class<?> module: modules) {
+        for (Class<?> module : modules) {
             try {
                 Constructor constructor = finder.search(module);
                 map.put(module, new ModuleMetadata(constructor, getDependencies(constructor)));
@@ -29,10 +29,15 @@ public class DependencyMapBuilder {
         return map;
     }
 
-    private List<Class<?>> getDependencies(Constructor constructor) {
+    private List<Class<?>> getDependencies(Constructor constructor) throws DependencyMapBuilderException {
         List<Class<?>> dependencies = new LinkedList<>();
         for (Class<?> dependency : constructor.getParameterTypes()) {
-            dependencies.add(dependency);
+            try {
+                Class<?> dependencyToAdd = new SubtypeResolver(dependency).resolve();
+                dependencies.add(dependencyToAdd);
+            } catch (SubtypeResolverException ex) {
+                throw new DependencyMapBuilderException(ex);
+            }
         }
         return dependencies;
     }
