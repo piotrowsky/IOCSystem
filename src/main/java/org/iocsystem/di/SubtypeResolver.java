@@ -10,24 +10,40 @@ import java.util.stream.Collectors;
 public class SubtypeResolver {
 
     private final Class<?> clazzToResolve;
+    private final Set<Class<?>> modules;
+    private final Impl implAnnotation;
 
-    public SubtypeResolver(Class<?> clazzToResolve) {
+    public SubtypeResolver(Class<?> clazzToResolve, Set<Class<?>> modules, Impl implAnnotation) {
         this.clazzToResolve = clazzToResolve;
+        this.modules = modules;
+        this.implAnnotation = implAnnotation;
     }
 
     public Class<?> resolve() throws SubtypeResolverException {
+        if(implAnnotation != null) {
+            Class<?> module = resolveForImpl();
+            validateForImpl(module);
+            return module;
+        }
+
         if (isNonConcrete()) {
             List<Class<?>> subTypeModules = getResolvableSubTypes();
             validateForNonConcrete(subTypeModules);
             return subTypeModules.get(0);
         }
 
-        if (clazzToResolve.getAnnotation(Module.class) != null) {
-            List<Class<?>> subTypeModules = getResolvableSubTypes();
-            validateForConcrete(subTypeModules);
-        }
-
         return clazzToResolve;
+    }
+
+    private Class<?> resolveForImpl() {
+        for (Class<?> module : modules) {
+            Module moduleAnnotation = module.getAnnotation(Module.class);
+            String name = moduleAnnotation.name();
+            if (!name.isEmpty() && name.equals(implAnnotation.name())) {
+                return module;
+            }
+        }
+        return null;
     }
 
     private boolean isNonConcrete() {
@@ -45,6 +61,13 @@ public class SubtypeResolver {
         return subTypeModules;
     }
 
+    private void validateForImpl(Class<?> module) throws SubtypeResolverException {
+        if (module == null) {
+            throw new SubtypeResolverException("No module named: " + implAnnotation.name()
+                    + " found for type: " + clazzToResolve);
+        }
+    }
+
     private void validateForNonConcrete(List<Class<?>> subTypeModules) throws SubtypeResolverException {
         if (subTypeModules.isEmpty()) {
             throw new SubtypeResolverException(
@@ -53,14 +76,6 @@ public class SubtypeResolver {
         if (subTypeModules.size() > 1) {
             throw new SubtypeResolverException(
                     "More than one @Module annotated type found for non concrete type: " + clazzToResolve
-                            + " Found types: " + subTypeModules);
-        }
-    }
-
-    private void validateForConcrete(List<Class<?>> subTypeModules) throws SubtypeResolverException {
-        if (!subTypeModules.isEmpty()) {
-            throw new SubtypeResolverException(
-                    "More than one @Module annotated subtype found for concrete type: " + clazzToResolve
                             + " Found types: " + subTypeModules);
         }
     }

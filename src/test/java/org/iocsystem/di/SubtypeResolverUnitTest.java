@@ -9,6 +9,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import static org.assertj.core.api.Assertions.*;
 
+// TODO
 @RunWith(BlockJUnit4ClassRunner.class)
 public class SubtypeResolverUnitTest {
 
@@ -29,7 +30,7 @@ public class SubtypeResolverUnitTest {
 
     @Test
     public void resolveForAbstract() throws SubtypeResolverException {
-        Class<?> resolved = new SubtypeResolver(A.class).resolve();
+        Class<?> resolved = new SubtypeResolver(A.class, null, null).resolve();
         assertThat(resolved).isEqualTo(B.class);
     }
 
@@ -42,7 +43,7 @@ public class SubtypeResolverUnitTest {
 
     @Test
     public void resolveForInterface() throws SubtypeResolverException {
-        Class<?> resolved = new SubtypeResolver(C.class).resolve();
+        Class<?> resolved = new SubtypeResolver(C.class, null, null).resolve();
         assertThat(resolved).isEqualTo(D.class);
     }
 
@@ -66,7 +67,7 @@ public class SubtypeResolverUnitTest {
         exception.expect(SubtypeResolverException.class);
         exception.expectMessage("More than one @Module annotated type found for non concrete type: " + E.class +
             " Found types:");
-        new SubtypeResolver(E.class).resolve();
+        new SubtypeResolver(E.class, null, null).resolve();
     }
 
     interface I {
@@ -92,7 +93,7 @@ public class SubtypeResolverUnitTest {
         exception.expect(SubtypeResolverException.class);
         exception.expectMessage("More than one @Module annotated type found for non concrete type: " + I.class +
                 " Found types:");
-        new SubtypeResolver(I.class).resolve();
+        new SubtypeResolver(I.class, null, null).resolve();
     }
 
     @Module
@@ -108,7 +109,7 @@ public class SubtypeResolverUnitTest {
         exception.expect(SubtypeResolverException.class);
         exception.expectMessage("More than one @Module annotated subtype found for concrete type: " + N.class
                 + " Found types:");
-        new SubtypeResolver(N.class).resolve();
+        new SubtypeResolver(N.class, null, null).resolve();
     }
 
     @Module
@@ -120,6 +121,6 @@ public class SubtypeResolverUnitTest {
 
     @Test
     public void resolveForOneConcreteImpl() throws SubtypeResolverException {
-        new SubtypeResolver(P.class).resolve();
+        new SubtypeResolver(P.class, null, null).resolve();
     }
 }

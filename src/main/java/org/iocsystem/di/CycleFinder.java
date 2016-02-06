@@ -53,7 +53,9 @@ public class CycleFinder {
         boolean visited;
 
         Vertex(ModuleMetadata moduleMetadata) {
-            super(moduleMetadata.getConstructor(), moduleMetadata.getDependencies());
+            super(moduleMetadata.getConstructor(),
+                    moduleMetadata.getName(),
+                    moduleMetadata.getDependencies());
         }
 
         @Override

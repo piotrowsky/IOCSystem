@@ -10,5 +10,4 @@ public final class ReflectUtils {
     public static boolean isOnlyDefaultConstructorPresent(Constructor[] constructors) {
         return constructors.length == 1 && constructors[0].getParameterCount() == 0;
     }
-
 }

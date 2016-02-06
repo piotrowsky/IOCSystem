@@ -6,10 +6,12 @@ import java.util.List;
 public class ModuleMetadata {
 
     private final Constructor constructor;
+    private final String name;
     private final List<Class<?>> dependencies;
 
-    public ModuleMetadata(Constructor constructor, List<Class<?>> dependencies) {
+    public ModuleMetadata(Constructor constructor, String name, List<Class<?>> dependencies) {
         this.constructor = constructor;
+        this.name = name;
         this.dependencies = dependencies;
     }
 
@@ -19,6 +21,10 @@ public class ModuleMetadata {
 
     public Constructor getConstructor() {
         return constructor;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<Class<?>> getDependencies() {

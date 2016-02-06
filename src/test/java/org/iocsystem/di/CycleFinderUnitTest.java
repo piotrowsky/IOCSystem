@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 
 import java.util.*;
 
+// TODO
 @RunWith(JUnitParamsRunner.class)
 public class CycleFinderUnitTest {
 
@@ -16,7 +17,6 @@ public class CycleFinderUnitTest {
     public ExpectedException exception = ExpectedException.none();
 
     private Map<Class, ModuleMetadata> dependencyMap;
-
 
     private static class Class1 {
         @Resolve
@@ -54,11 +54,11 @@ public class CycleFinderUnitTest {
     @Test
     public void findCycle() throws Exception {
         dependencyMap.put(Class1.class,
-                new ModuleMetadata(Class1.class.getConstructor(Class2.class), Arrays.asList(Class2.class)));
+                new ModuleMetadata(Class1.class.getConstructor(Class2.class), "A", Arrays.asList(Class2.class)));
         dependencyMap.put(Class2.class,
-                new ModuleMetadata(Class2.class.getConstructor(Class3.class), Arrays.asList(Class3.class)));
+                new ModuleMetadata(Class2.class.getConstructor(Class3.class), "B", Arrays.asList(Class3.class)));
         dependencyMap.put(Class3.class,
-                new ModuleMetadata(Class3.class.getConstructor(Class1.class), Arrays.asList(Class1.class)));
+                new ModuleMetadata(Class3.class.getConstructor(Class1.class), "C", Arrays.asList(Class1.class)));
 
         exception.expect(CycleFinderException.class);
         exception.expectMessage("Cyclic reference detected!. Cyclic path: ");
@@ -69,9 +69,9 @@ public class CycleFinderUnitTest {
     @Test
     public void findNoCycle() throws Exception {
         dependencyMap.put(Class4.class,
-                new ModuleMetadata(Class4.class.getConstructor(Class5.class), Arrays.asList(Class5.class)));
+                new ModuleMetadata(Class4.class.getConstructor(Class5.class), "A", Arrays.asList(Class5.class)));
         dependencyMap.put(Class5.class,
-                new ModuleMetadata(Class5.class.getDeclaredConstructor(), Collections.EMPTY_LIST));
+                new ModuleMetadata(Class5.class.getDeclaredConstructor(), "B", Collections.EMPTY_LIST));
 
         Class1.class.getSuperclass();
         new CycleFinder(dependencyMap).find();
