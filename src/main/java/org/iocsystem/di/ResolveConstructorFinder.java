@@ -6,7 +6,7 @@ import org.reflections.ReflectionUtils;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
-public class ConstructorFinder {
+public class ResolveConstructorFinder {
 
     public Constructor search(Class<?> clazz) throws ConstructorFinderException {
         Constructor[] constructors = clazz.getDeclaredConstructors();

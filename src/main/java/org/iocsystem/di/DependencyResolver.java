@@ -1,5 +1,7 @@
 package org.iocsystem.di;
 
+import org.iocsystem.callback.LifecycleProcessorManager;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,14 +11,12 @@ import java.util.Map;
 public class DependencyResolver {
 
     private final Map<Class, ModuleMetadata> dependencyMap;
-    private final Map<Class, Object> modules = new HashMap<>();
+    private final Map<Class<?>, InstanceProvider> factoryMap;
+    private final Map<Class, Object> instanceMap = new HashMap<>();
 
-    public DependencyResolver(Map<Class, ModuleMetadata> dependencyMap) {
+    public DependencyResolver(Map<Class, ModuleMetadata> dependencyMap, Map<Class<?>, InstanceProvider> factoryMap) {
         this.dependencyMap = dependencyMap;
-    }
-
-    public Map<Class, Object> getModuleMap() {
-        return modules;
+        this.factoryMap = factoryMap;
     }
 
     public void resolve() throws DependencyResolverException {
@@ -52,7 +52,7 @@ public class DependencyResolver {
             throws IllegalAccessException, InvocationTargetException, InstantiationException {
         List<Object> dependencies = new LinkedList<>();
         for (Class<?> dependency : moduleMetadata.getDependencies()) {
-            Object object = modules.get(dependency);
+            Object object = instanceMap.get(dependency);
             if (object != null && uninitialized.isEmpty()) {
                 dependencies.add(object);
             } else if (object == null) {
@@ -64,7 +64,16 @@ public class DependencyResolver {
 
     private void instantiateAndRegister(ModuleMetadata moduleMetadata, Object... params)
             throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        moduleMetadata.getConstructor().setAccessible(true);
-        modules.put(moduleMetadata.getClazz(), moduleMetadata.getConstructor().newInstance(params));
+        InstanceProvider instanceProvider = factoryMap.get(moduleMetadata.getClazz());
+        if (instanceProvider != null) {
+            instanceMap.put(moduleMetadata.getClazz(), instanceProvider.provide(params));
+        } else {
+            moduleMetadata.getConstructor().setAccessible(true);
+            instanceMap.put(moduleMetadata.getClazz(), moduleMetadata.getConstructor().newInstance(params));
+        }
+    }
+
+    public Map<Class, Object> getInstanceMap() {
+        return instanceMap;
     }
 }

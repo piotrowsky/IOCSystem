@@ -17,7 +17,7 @@ public class DependencyMapBuilder {
     }
 
     public Map<Class, ModuleMetadata> build() throws DependencyMapBuilderException {
-        ConstructorFinder finder = new ConstructorFinder();
+        ResolveConstructorFinder finder = new ResolveConstructorFinder();
         Map<Class, ModuleMetadata> map = new HashMap<>();
         for (Class<?> module : modules) {
             try {

@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 import static org.assertj.core.api.Assertions.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class ConstructorFinderUnitTest {
+public class ResolveConstructorFinderUnitTest {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -34,7 +34,7 @@ public class ConstructorFinderUnitTest {
     @Test
     @Parameters
     public void validCases(Class<?> clazz) throws Exception {
-        Constructor constructor = new ConstructorFinder().search(clazz);
+        Constructor constructor = new ResolveConstructorFinder().search(clazz);
         assertThat(constructor.getDeclaringClass()).isEqualTo(clazz);
     }
 
@@ -49,7 +49,7 @@ public class ConstructorFinderUnitTest {
     public void invaliCaseNoResolvableConstructorFound(Class<?> clazz) throws Exception {
         exception.expect(ConstructorFinderException.class);
         exception.expectMessage("None @Resolve annotated constructor found");
-        new ConstructorFinder().search(clazz);
+        new ResolveConstructorFinder().search(clazz);
     }
 
     private Object parametersForInvaliCaseTooManyResolvableConstructorsFound() {
@@ -63,6 +63,6 @@ public class ConstructorFinderUnitTest {
     public void invaliCaseTooManyResolvableConstructorsFound(Class<?> clazz) throws Exception {
         exception.expect(ConstructorFinderException.class);
         exception.expectMessage("More than one @Resolve annotated constructor found");
-        new ConstructorFinder().search(clazz);
+        new ResolveConstructorFinder().search(clazz);
     }
 }
