@@ -1,11 +1,12 @@
 package org.iocsystem.main;
 
+import org.iocsystem.aspect.AspectException;
+import org.iocsystem.aspect.AspectManager;
 import org.iocsystem.callback.LifecycleProcessorException;
 import org.iocsystem.callback.LifecycleProcessorManager;
 import org.iocsystem.di.*;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class IocSystem {
 
@@ -16,6 +17,8 @@ public class IocSystem {
         try {
             Set<Class<?>> modules = new AnnotationTypeFilter().filter(Module.class, Configuration.getScanPrefix());
             validateModules(modules);
+            AspectManager.detectAspects();
+            modules = applyAspects(modules);
             registerLifecycles(modules);
             Set<Class<?>> factories = new AnnotationTypeFilter().filter(Factory.class, Configuration.getScanPrefix());
             validateFactories(modules, factories);
@@ -60,7 +63,6 @@ public class IocSystem {
     }
 
     private static void validateDepencyTree(Map<Class, ModuleMetadata> dependencyMap) throws CycleFinderException {
-        // TODO check resolvability
         new CycleFinder(dependencyMap).find();
     }
 
@@ -68,5 +70,14 @@ public class IocSystem {
         for (Class<?> module : modules) {
             LifecycleProcessorManager.register(module);
         }
+    }
+
+    private static Set<Class<?>> applyAspects(Set<Class<?>> modules) throws AspectException {
+        Set<Class<?>> enrichedModules = new HashSet<>();
+        for (Class<?> module : modules) {
+            enrichedModules.add(AspectManager.apply(module));
+        }
+
+        return enrichedModules;
     }
 }
